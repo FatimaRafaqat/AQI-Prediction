@@ -1,2 +1,2 @@
 # AQI-Prediction
-Using ML model predicts the AQI 
+Using ML model to predict the AQI 
