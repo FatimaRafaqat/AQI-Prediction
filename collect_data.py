@@ -37,7 +37,7 @@ def fetch_air_pollution(lat, lon, api_key):
 if __name__ == "__main__":
     df = fetch_air_pollution(LAT, LON, API_KEY)
     if df is not None:
-        print("✅ Fetched AQI Data for Islamabad:")
+        print("✅ Fetched AQI data for Islamabad:")
         print(df)
     else:
         print("⚠️ No data received.")
