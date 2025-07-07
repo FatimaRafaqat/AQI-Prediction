@@ -54,12 +54,13 @@ project = hopsworks.login(
 )
 
 fs = project.get_feature_store()
+df["timestamp_str"] = df["timestamp"].astype(str)
 
 # Create or get feature group
 feature_group = fs.get_or_create_feature_group(
     name="aqi_data_islamabad",
     version=1,
-    primary_key=["timestamp"],
+    primary_key=["timestamp_str"],
     description="Hourly AQI data for Islamabad",
     online_enabled=True
 )
