@@ -40,6 +40,8 @@ if __name__ == "__main__":
     df = fetch_air_pollution(LAT, LON, API_KEY)
     if df is not None:
         df["timestamp_str"] = df["timestamp"].astype(str)
+        df.drop(columns=["timestamp"], inplace=True)
+
         print("✅ Fetched AQI data for Islamabad:")
         print(df)
     else:
