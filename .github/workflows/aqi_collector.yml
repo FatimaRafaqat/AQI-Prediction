@@ -20,12 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests pandas hsfs
-
-
-    - name: Install dependencies
-      run: |
-        pip install requests pandas
+        pip install requests pandas hopsworks
 
     - name: Run script
       env:
