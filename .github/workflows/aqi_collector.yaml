@@ -1,0 +1,30 @@
+name: Collect AQI Data Hourly
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # every hour (UTC)
+  workflow_dispatch:     # optional manual trigger
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install requests pandas
+
+    - name: Run script
+      env:
+        HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        HOPSWORKS_PROJECT_NAME: ${{ secrets.HOPSWORKS_PROJECT_NAME }}
+        HOPSWORKS_API_URL: ${{ secrets.HOPSWORKS_API_URL }}
+      run: python collect_data.py
