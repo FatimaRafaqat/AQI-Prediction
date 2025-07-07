@@ -1,6 +1,8 @@
 import requests
 import pandas as pd
 from datetime import datetime
+import os
+import hopsworks
 
 # Coordinates for Islamabad
 LAT = 33.6844
@@ -41,3 +43,28 @@ if __name__ == "__main__":
         print(df)
     else:
         print("⚠️ No data received.")
+
+
+
+# Login to Hopsworks using environment variables
+project = hopsworks.login(
+    api_key_value=os.environ["HOPSWORKS_API_KEY"],
+    project=os.environ["HOPSWORKS_PROJECT_NAME"],
+    host=os.environ["HOPSWORKS_API_URL"]
+)
+
+fs = project.get_feature_store()
+
+# Create or get feature group
+feature_group = fs.get_or_create_feature_group(
+    name="aqi_data_islamabad",
+    version=1,
+    primary_key=["timestamp"],
+    description="Hourly AQI data for Islamabad",
+    online_enabled=True
+)
+
+# Insert the new record
+feature_group.insert(df, write_options={"wait_for_job": False})
+print("✅ Data successfully inserted into Hopsworks Feature Store")
+
