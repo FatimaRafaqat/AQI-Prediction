@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests pandas hopsworks
+        pip install "hopsworks[python]" pandas requests pyarrow
 
     - name: Run script
       env:
