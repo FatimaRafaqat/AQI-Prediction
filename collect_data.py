@@ -50,7 +50,7 @@ if __name__ == "__main__":
 project = hopsworks.login(
     api_key_value=os.environ["HOPSWORKS_API_KEY"],
     project=os.environ["HOPSWORKS_PROJECT_NAME"],
-    host=os.environ["HOPSWORKS_API_URL"]
+    host="https://c.app.hopsworks.ai"
 )
 
 fs = project.get_feature_store()
