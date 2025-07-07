@@ -67,6 +67,10 @@ feature_group = fs.get_or_create_feature_group(
 )
 
 # Insert the new record
-feature_group.insert(df, write_options={"wait_for_job": False})
+# Insert the new record (exclude raw datetime column)
+feature_group.insert(df[[
+    "timestamp_str", "aqi_index", "co", "no", "no2", "o3", "so2", "pm2_5", "pm10", "nh3"
+]], write_options={"wait_for_job": False})
+
 print("✅ Data successfully inserted into Hopsworks Feature Store")
 
