@@ -39,6 +39,7 @@ def fetch_air_pollution(lat, lon, api_key):
 if __name__ == "__main__":
     df = fetch_air_pollution(LAT, LON, API_KEY)
     if df is not None:
+        df["timestamp_str"] = df["timestamp"].astype(str)
         print("✅ Fetched AQI data for Islamabad:")
         print(df)
     else:
@@ -54,7 +55,7 @@ project = hopsworks.login(
 )
 
 fs = project.get_feature_store()
-df["timestamp_str"] = df["timestamp"].astype(str)
+
 
 # Create or get feature group
 feature_group = fs.get_or_create_feature_group(
