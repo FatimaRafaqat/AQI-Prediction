@@ -61,12 +61,13 @@ fs = project.get_feature_store()
 
 # Create or get feature group
 feature_group = fs.get_or_create_feature_group(
-    name="aqi_data_islamabad",
+    name="aqi_data_islamabad_v2",  # ← NEW name
     version=1,
     primary_key=["timestamp_str"],
     description="Hourly AQI data for Islamabad",
     online_enabled=True
 )
+
 
 # Insert the new record
 # Insert the new record (exclude raw datetime column)
