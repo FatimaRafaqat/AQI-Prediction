@@ -39,23 +39,23 @@ def fetch_air_pollution(lat, lon, api_key):
 if __name__ == "__main__":
     df = fetch_air_pollution(LAT, LON, API_KEY)
     if df is not None:
-        # ✅ Convert numeric columns to float
-        numeric_cols = [
-            "aqi_index", "co", "no", "no2", "o3", "so2", "pm2_5", "pm10", "nh3"
-        ]
-        df[numeric_cols] = df[numeric_cols].astype(float)
+        # ✅ Correctly cast column types
+        df["aqi_index"] = df["aqi_index"].astype(int)  # Hopsworks expects bigint
+        pollution_cols = ["co", "no", "no2", "o3", "so2", "pm2_5", "pm10", "nh3"]
+        df[pollution_cols] = df[pollution_cols].astype(float)
 
-        # ✅ Add timestamp string and drop datetime
+        # ✅ Create a string version of timestamp for primary key
         df["timestamp_str"] = df["timestamp"].astype(str)
         df.drop(columns=["timestamp"], inplace=True)
 
         print("✅ Fetched AQI data for Islamabad:")
         print(df)
+        print(df.dtypes)  # Optional: Confirm data types
     else:
         print("⚠️ No data received.")
         exit()
 
-    # ✅ Login to Hopsworks using env variables
+    # ✅ Login to Hopsworks using environment variables
     project = hopsworks.login(
         api_key_value=os.environ["HOPSWORKS_API_KEY"],
         project=os.environ["HOPSWORKS_PROJECT_NAME"],
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         online_enabled=True
     )
 
-    # ✅ Insert the new record
+    # ✅ Insert the record into the feature group
     feature_group.insert(df[[
         "timestamp_str", "aqi_index", "co", "no", "no2", "o3", "so2", "pm2_5", "pm10", "nh3"
     ]], write_options={"wait_for_job": False})
