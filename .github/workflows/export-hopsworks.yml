@@ -24,10 +24,10 @@ jobs:
       env:
         HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
       run: |
-        python export_hopsworks_data.py
+        python data.py
 
     - name: Upload CSV as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: hopsworks-export
+        name: hopsworks-data
         path: hopsworks_data.csv
