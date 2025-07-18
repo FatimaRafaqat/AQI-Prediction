@@ -18,7 +18,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install hopsworks pandas
+        pip install "hopsworks[python]" pandas
+
 
     - name: Run export script
       env:
