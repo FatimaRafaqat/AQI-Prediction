@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import hopsworks
+import os
 
 # ==================== Connect to Hopsworks ==========================
-import os
 project = hopsworks.login(api_key_value=os.environ["HOPSWORKS_API_KEY"])
-
 fs = project.get_feature_store()
 
 # === Get Raw Data from Hopsworks ===
@@ -82,7 +81,7 @@ breakpoints = {
     ]
 }
 
-# AQI Functions
+# AQI Calculation
 def calculate_aqi(concentration, bps):
     for bp in bps:
         if bp["low"] <= concentration <= bp["high"]:
@@ -98,23 +97,24 @@ def calculate_row_aqi(row):
                 max_aqi = aqi
     return max_aqi
 
-# Calculate AQI
+# Calculate AQI and rate of change
 df["calculated_aqi"] = df.apply(calculate_row_aqi, axis=1).round(2)
-
-# Calculate rate of change
 df = df.sort_values("timestamp_str").reset_index(drop=True)
 df["aqi_change_rate"] = df["calculated_aqi"].diff().fillna(0).round(2)
 
-# ===================== Preprocessing ==============================
+# Preprocessing
 df["no_log"] = np.log1p(df["no"])
 df["so2_log"] = np.log1p(df["so2"])
 df["nh3_log"] = np.log1p(df["nh3"])
 
-# Drop raw and unnecessary columns
-df.drop(columns=["pm2_5", "pm10", "aqi_index", "no", "so2", "nh3"], inplace=True)
+# Drop raw columns
+df.drop(columns=["timestamp_str", "pm2_5", "pm10", "aqi_index", "no", "so2", "nh3"], inplace=True)
+
+# Add unique ID as primary key
+df.insert(0, "id", range(1, len(df) + 1))
 
 # Scaling
-features_to_scale = ["co", "no_log", "no2", "o3", "so2_log", "nh3_log", "hour", "day"]
+features_to_scale = ["co", "no_log", "no2", "o3", "so2_log", "nh3_log", "hour", "day", "month", "aqi_change_rate"]
 scaler = MinMaxScaler()
 scaled = scaler.fit_transform(df[features_to_scale])
 scaled_df = pd.DataFrame(scaled, columns=[f"{col}_scaled" for col in features_to_scale])
@@ -130,13 +130,14 @@ def cap_outliers(df, col):
 
 df_final = cap_outliers(df_final, "no_log_scaled")
 df_final = cap_outliers(df_final, "so2_log_scaled")
+df_final = cap_outliers(df_final, "aqi_change_rate_scaled")
 
-# ===================== Store to Hopsworks ==========================
+# Store in Hopsworks
 processed_fg = fs.get_or_create_feature_group(
-    name="processed_aqi_data",
+    name="processed_aqi_data_v2",
     version=1,
-    primary_key=["timestamp_str"],
-    description="Preprocessed AQI data with feature engineering"
+    primary_key=["id"],
+    description="Preprocessed AQI data with feature engineering, scaled month and change rate"
 )
 
 processed_fg.insert(df_final, write_options={"wait_for_job": True})
