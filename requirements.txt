@@ -1,0 +1,5 @@
+hopsworks[python]
+pyarrow
+pandas
+numpy
+scikit-learn
