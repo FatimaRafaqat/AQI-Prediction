@@ -1,4 +1,4 @@
-name: Daily Feature Engineering
+name: Daily Feature Engineering and Model Training
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:     # Allow manual trigger
 
 jobs:
-  preprocess:
+  preprocess_and_train:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,12 @@ jobs:
         run: |
           echo "HOPSWORKS_API_KEY=$(cat hopsworks_api.key)" >> $GITHUB_ENV
 
-      - name: Run preprocessing script
+      - name: 🔄 Run preprocessing script
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
         run: python featureEng_Preprocess.py
+
+      - name: 🤖 Run AQI model training
+        env:
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        run: python aqi_model_linear.py
