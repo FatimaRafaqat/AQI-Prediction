@@ -4,7 +4,9 @@ from sklearn.preprocessing import MinMaxScaler
 import hopsworks
 
 # ==================== Connect to Hopsworks ==========================
-project = hopsworks.login()
+import os
+project = hopsworks.login(api_key_value=os.environ["HOPSWORKS_API_KEY"])
+
 fs = project.get_feature_store()
 
 # === Get Raw Data from Hopsworks ===
