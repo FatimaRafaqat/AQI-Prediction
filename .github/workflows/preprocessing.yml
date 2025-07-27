@@ -35,4 +35,4 @@ jobs:
       - name: 🤖 Run AQI model training
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: python aqi_model_linear.py
+        run: python Linear_regression.py
