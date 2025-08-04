@@ -40,4 +40,4 @@ jobs:
       - name: 🌲 Run Random Forest 3-day AQI prediction
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: python random_forest_3day_hops.py
+        run: python random_forest.py
