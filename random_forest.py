@@ -11,7 +11,7 @@ import hopsworks
 project = hopsworks.login(api_key_value=os.environ["HOPSWORKS_API_KEY"])
 fs = project.get_feature_store()
 
-processed_fg = fs.get_feature_group(name="processed_aqi_data", version=1)
+processed_fg = fs.get_feature_group(name="processed_aqi_data_v2", version=1)
 df = processed_fg.read()
 print("✅ Loaded processed AQI data from Hopsworks")
 
