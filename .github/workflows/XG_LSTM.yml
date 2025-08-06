@@ -1,0 +1,42 @@
+name: AQI Forecasting Models
+
+on:
+  push:
+    paths:
+      - 'LSTM.py'
+      - 'XGBoost.py'
+      - 'prophet.py'
+  workflow_dispatch:
+
+jobs:
+  run-all-models:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📚 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔐 Run XGBoost Model
+        env:
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        run: python XGBoost.py
+
+      - name: 🔐 Run LSTM Model
+        env:
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        run: python LSTM.py
+
+      - name: 🔐 Run Prophet Model
+        env:
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        run: python prophet.py
