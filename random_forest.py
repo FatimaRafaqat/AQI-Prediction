@@ -16,9 +16,10 @@ df = processed_fg.read()
 print("✅ Loaded processed AQI data from Hopsworks")
 
 # === Step 2: Convert to Daily AQI and Create Lags ===
-df["date"] = pd.to_datetime(df["date"])
+df["date"] = pd.to_datetime(df["timestamp_str"])  # FIXED line
 daily_df = df.groupby("date").agg({"calculated_aqi": "mean"}).reset_index()
 daily_df.rename(columns={"calculated_aqi": "aqi"}, inplace=True)
+
 
 # Create lag features (last 7 days AQI)
 for lag in range(1, 8):
