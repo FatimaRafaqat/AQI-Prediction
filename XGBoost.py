@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 import hopsworks
@@ -27,12 +27,12 @@ y = df["calculated_aqi"]
 # === Step 3: Train-Test Split ===
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
-# === Step 4: Train Random Forest Model ===
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
-rf.fit(X_train, y_train)
+# === Step 4: Train XGBoost Regressor ===
+model = XGBRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
 
-# === Step 5: Evaluate on Test Set ===
-y_pred = rf.predict(X_test)
+# === Step 5: Evaluate ===
+y_pred = model.predict(X_test)
 
 print("\n📊 Evaluation on Test Set")
 print(f"📉 MAE: {mean_absolute_error(y_test, y_pred):.2f}")
@@ -43,20 +43,20 @@ next_preds = []
 latest_input = X.iloc[-1].copy()
 
 for day in range(3):
-    pred = rf.predict(latest_input.values.reshape(1, -1))[0]
+    pred = model.predict(latest_input.values.reshape(1, -1))[0]
     next_preds.append(pred)
 
-    # (Optional) If needed, update input features here if model was dynamic
+    # (Optional) If AQI affects features, you can simulate feature changes here
 
 print("\n📅 Recursive Forecast for Next 3 Days AQI:")
 for i, p in enumerate(next_preds, 1):
     print(f"🔮 Day +{i} AQI: {p:.2f}")
 
-# === Step 7: Plot Actual vs Predicted ===
+# === Step 7: Plot ===
 plt.figure(figsize=(8, 5))
 plt.plot(y_test.values[:30], label="Actual")
 plt.plot(y_pred[:30], label="Predicted")
-plt.title("Random Forest - AQI Prediction")
+plt.title("XGBoost - AQI Prediction")
 plt.xlabel("Sample")
 plt.ylabel("AQI")
 plt.grid(True)
