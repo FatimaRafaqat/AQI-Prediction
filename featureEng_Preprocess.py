@@ -25,7 +25,7 @@ df["hour"] = df["timestamp_str"].dt.hour
 df["day"] = df["timestamp_str"].dt.day
 df["month"] = df["timestamp_str"].dt.month
 
-# AQI Breakpoints (US EPA standard)
+# === AQI Breakpoints (US EPA standard) ===
 breakpoints = {
     "pm2_5": [
         {"low": 0.0, "high": 12.0, "aqi_low": 0, "aqi_high": 50},
@@ -81,7 +81,7 @@ breakpoints = {
     ]
 }
 
-# AQI Calculation
+# === AQI Calculation ===
 def calculate_aqi(concentration, bps):
     for bp in bps:
         if bp["low"] <= concentration <= bp["high"]:
@@ -97,23 +97,22 @@ def calculate_row_aqi(row):
                 max_aqi = aqi
     return max_aqi
 
-# Calculate AQI and rate of change
 df["calculated_aqi"] = df.apply(calculate_row_aqi, axis=1).round(2)
 df = df.sort_values("timestamp_str").reset_index(drop=True)
 df["aqi_change_rate"] = df["calculated_aqi"].diff().fillna(0).round(2)
 
-# Preprocessing
+# === Log Transform ===
 df["no_log"] = np.log1p(df["no"])
 df["so2_log"] = np.log1p(df["so2"])
 df["nh3_log"] = np.log1p(df["nh3"])
 
-# Drop raw columns
-df.drop(columns=["timestamp_str", "pm2_5", "pm10", "aqi_index", "no", "so2", "nh3"], inplace=True)
+# ❌ Don't drop timestamp_str anymore
+df.drop(columns=["pm2_5", "pm10", "aqi_index", "no", "so2", "nh3"], inplace=True)
 
-# Add unique ID as primary key
+# Add unique ID
 df.insert(0, "id", range(1, len(df) + 1))
 
-# Scaling
+# === Scaling ===
 features_to_scale = ["co", "no_log", "no2", "o3", "so2_log", "nh3_log", "hour", "day", "month", "aqi_change_rate"]
 scaler = MinMaxScaler()
 scaled = scaler.fit_transform(df[features_to_scale])
@@ -121,7 +120,7 @@ scaled_df = pd.DataFrame(scaled, columns=[f"{col}_scaled" for col in features_to
 
 df_final = pd.concat([df.drop(columns=features_to_scale), scaled_df], axis=1)
 
-# Winsorization
+# === Winsorization ===
 def cap_outliers(df, col):
     lower = df[col].quantile(0.01)
     upper = df[col].quantile(0.99)
@@ -132,12 +131,12 @@ df_final = cap_outliers(df_final, "no_log_scaled")
 df_final = cap_outliers(df_final, "so2_log_scaled")
 df_final = cap_outliers(df_final, "aqi_change_rate_scaled")
 
-# Store in Hopsworks
+# === Store in Hopsworks ===
 processed_fg = fs.get_or_create_feature_group(
     name="processed_aqi_data_v2",
     version=1,
     primary_key=["id"],
-    description="Preprocessed AQI data with feature engineering, scaled month and change rate"
+    description="Preprocessed AQI data with timestamp and scaled features"
 )
 
 processed_fg.insert(df_final, write_options={"wait_for_job": True})
