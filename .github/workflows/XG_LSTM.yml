@@ -5,7 +5,7 @@ on:
     paths:
       - 'LSTM.py'
       - 'XGBoost.py'
-      - 'prophet.py'
+      - 'prophet_model.py'
   workflow_dispatch:
 
 jobs:
@@ -39,4 +39,4 @@ jobs:
       - name: 🔐 Run Prophet Model
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: python prophet.py
+        run: python prophet_model.py
