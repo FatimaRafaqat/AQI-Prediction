@@ -45,9 +45,9 @@ jobs:
       - name: 🌲 Run XGBoost Model 3-day AQI prediction
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: XGBoost.py
+        run: python XGBoost.py
 
       - name: 🌲 Run Mutli Output Regressor Model 3-day AQI prediction
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: multioutputReg.py
+        run: python multioutputReg.py
