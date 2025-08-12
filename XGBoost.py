@@ -76,4 +76,34 @@ for i, target in enumerate(target_cols):
 # === Step 6: Predict next 3 days AQI from the latest data ===
 last_features = X.iloc[[-1]]
 future_preds = model.predict(last_features)
-print("\nNext 3 days AQI predictions:", np.round(future_preds[0], 2))
+future_preds = np.round(future_preds[0], 2)  # 1D array of [day1, day2, day3]
+print("\nNext 3 days AQI predictions:", future_preds)
+
+# === Step 7: Store predictions into Hopsworks ===
+from datetime import datetime, timedelta
+
+# Build DataFrame for insertion
+today = pd.Timestamp.utcnow().normalize()
+dates = [today + pd.Timedelta(days=i+1) for i in range(3)]  # next 3 days
+
+pred_df = pd.DataFrame({
+    "prediction_date": [d.strftime("%Y-%m-%d") for d in dates],  # store as string
+    "prediction_value": future_preds,
+    "horizon_day": [1, 2, 3],
+    "model_version": ["v1.0"] * 3,
+    "prediction_ts": pd.Timestamp.utcnow()  # event time can still be timestamp
+})
+
+# Create (or get) the Feature Group
+pred_fg = fs.get_or_create_feature_group(
+    name="model_predictions",
+    version=1,
+    primary_key=["prediction_date"],  # now string type
+    description="3-day AQI forecasts",
+    online_enabled=True,
+    event_time="prediction_ts"
+)
+
+# Insert into Feature Group
+pred_fg.insert(pred_df, write_options={"wait_for_job": False})
+print("✅ Predictions uploaded to Hopsworks Feature Group 'model_predictions'")
