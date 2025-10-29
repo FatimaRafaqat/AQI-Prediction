@@ -3,14 +3,14 @@
 “Clean air meets clean code.”
 A fully serverless machine learning pipeline that predicts the Air Quality Index (AQI) for the next 3 days using real-time environmental data from the OpenWeather API.
 
-📖 Overview
+# 📖 Overview
 
 Air pollution is a growing concern that affects human health and the environment.
 This project aims to predict the Air Quality Index (AQI) for upcoming days using historical and real-time pollutant data.
 
 It automates the entire process — from data collection to dashboard visualization — using a serverless CI/CD pipeline and machine learning models deployed with FastAPI.
 
-🚀 Features
+# 🚀 Features
 
 ✅ Automated Data Collection
 
@@ -42,7 +42,7 @@ Displays AQI trends on a real-time dashboard.
 
 Fully automated workflow — hourly data updates and daily retraining with zero manual intervention.
 
-📊 Model Performance
+# 📊 Model Performance
 | Model                  | R² Score  | Notes                                   |
 | ---------------------- | --------- | --------------------------------------- |
 | Linear Regression      | 0.85–0.90 | Baseline model                          |
